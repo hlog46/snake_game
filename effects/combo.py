@@ -1,8 +1,11 @@
 """连击特效：Combo 文字 + 屏幕震动"""
 import pygame
 import random
+import math
 from config.settings import COMBO_WINDOW, COMBO_MIN_COUNT, SCREEN_W, SCREEN_H
 from config.fonts import get_font
+
+_SHAKE_STEPS = 12  # 预生成震动序列帧数
 
 
 class ComboEffect:
@@ -13,6 +16,8 @@ class ComboEffect:
         self.display_timer = 0.0
         self.shake_timer = 0.0
         self.shake_offset = (0, 0)
+        self._shake_seq: list = []   # 预生成的震动偏移序列
+        self._shake_idx: int = 0
         self._font = None
 
     def _get_font(self):
@@ -37,13 +42,25 @@ class ComboEffect:
         self.display_text = f"COMBO x{self.combo_count}!"
         self.display_timer = 0.8
         self.shake_timer = 0.2
+        # 预生成平滑震动序列（正弦衰减）
+        amp = min(5, 2 + self.combo_count // 2)
+        self._shake_seq = [
+            (int(amp * math.sin(i * math.pi * 2 / _SHAKE_STEPS + random.uniform(-0.3, 0.3))),
+             int(amp * math.cos(i * math.pi * 3 / _SHAKE_STEPS + random.uniform(-0.3, 0.3))))
+            for i in range(_SHAKE_STEPS)
+        ]
+        self._shake_idx = 0
 
     def update(self, dt: float):
         if self.display_timer > 0:
             self.display_timer = max(0.0, self.display_timer - dt)
         if self.shake_timer > 0:
             self.shake_timer = max(0.0, self.shake_timer - dt)
-            self.shake_offset = (random.randint(-3, 3), random.randint(-3, 3))
+            if self._shake_seq:
+                self.shake_offset = self._shake_seq[self._shake_idx % len(self._shake_seq)]
+                self._shake_idx += 1
+            else:
+                self.shake_offset = (0, 0)
         else:
             self.shake_offset = (0, 0)
 

@@ -11,6 +11,8 @@ class ScreenFlash:
 
     def trigger(self, color: tuple, initial_alpha: float, duration: float):
         """触发屏幕闪光。color=RGB, initial_alpha=0~255, duration=秒。"""
+        if duration <= 0:
+            return
         self.active = True
         self.color = color
         self.alpha = float(initial_alpha)

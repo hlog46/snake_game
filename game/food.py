@@ -52,7 +52,8 @@ class FoodManager:
         # 更新普通食物（困难模式有超时）
         if self.normal_food:
             if not self.normal_food.update(dt):
-                # 超时，刷新位置
+                # 超时，先清空再刷新位置
+                self.normal_food = None
                 self.spawn_normal(occupied)
 
         # 更新特殊食物

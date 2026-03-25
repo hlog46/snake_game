@@ -35,10 +35,9 @@ class ForestTheme(BaseTheme):
 
     def draw_snake(self, surface, snake, board, power_up: str = None):
         cs = board.CELL_SIZE
-        body_list = list(snake.body)
-        length = len(body_list)
+        length = len(snake.body)
 
-        for i, pos in enumerate(body_list):
+        for i, pos in enumerate(snake.body):
             x, y = board.cell_to_pixel(*pos)
             t = i / max(length - 1, 1)
 
@@ -81,13 +80,16 @@ class ForestTheme(BaseTheme):
 
     def _draw_eyes(self, surface, x, y, cs, direction):
         dc, dr = direction
-        if dc == 1:    eye_positions = [(x + cs - 5, y + 4), (x + cs - 5, y + cs - 7)]
-        elif dc == -1: eye_positions = [(x + 3, y + 4), (x + 3, y + cs - 7)]
-        elif dr == -1: eye_positions = [(x + 4, y + 3), (x + cs - 7, y + 3)]
-        else:          eye_positions = [(x + 4, y + cs - 5), (x + cs - 7, y + cs - 5)]
+        eo = max(2, cs // 5)   # 眼睛距格子边缘的偏移
+        eg = max(2, cs // 4)   # 两眼的横/纵间距
+        er = max(1, cs // 10)  # 眼睛半径
+        if dc == 1:    eye_positions = [(x + cs - eo, y + eg), (x + cs - eo, y + cs - eg - 1)]
+        elif dc == -1: eye_positions = [(x + eo, y + eg), (x + eo, y + cs - eg - 1)]
+        elif dr == -1: eye_positions = [(x + eg, y + eo), (x + cs - eg - 1, y + eo)]
+        else:          eye_positions = [(x + eg, y + cs - eo), (x + cs - eg - 1, y + cs - eo)]
         for ep in eye_positions:
-            pygame.draw.circle(surface, (0, 0, 0), ep, 2)
-            pygame.draw.circle(surface, (255, 255, 150), ep, 1)
+            pygame.draw.circle(surface, (0, 0, 0), ep, er)
+            pygame.draw.circle(surface, (255, 255, 150), ep, max(1, er - 1))
 
     def draw_food(self, surface, food, board):
         x, y = board.cell_to_pixel(*food.pos)

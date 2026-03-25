@@ -51,10 +51,9 @@ class NeonTheme(BaseTheme):
 
     def draw_snake(self, surface, snake, board, power_up: str = None):
         cs = board.CELL_SIZE
-        body_list = list(snake.body)
-        length = len(body_list)
+        length = len(snake.body)
 
-        for i, pos in enumerate(body_list):
+        for i, pos in enumerate(snake.body):
             x, y = board.cell_to_pixel(*pos)
             cx, cy = x + cs // 2, y + cs // 2
             t = i / max(length - 1, 1)
