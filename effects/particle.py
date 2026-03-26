@@ -26,6 +26,8 @@ class Particle:
 
     @property
     def alpha(self) -> int:
+        if self.lifetime <= 0:
+            return 0
         return int(255 * max(0.0, 1.0 - self.age / self.lifetime))
 
     def draw(self, surface):

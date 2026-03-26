@@ -137,6 +137,7 @@ class GameController:
         self.emitter = ParticleEmitter()
         self.combo = ComboEffect()
         self.death_effect = DeathEffect()
+        self.flash = ScreenFlash()
 
         # 清除旧的 "is_new" 标记
         for k in self.highscores:
@@ -329,6 +330,9 @@ class GameController:
         cfg = DIFFICULTY_CONFIG[self.difficulty]
         self.snake.trigger_head_flash()
 
+        # 记录吃食物前的道具状态，用于倍率计算
+        prev_power_up = self.power_up_type
+
         # 基础分
         if food.food_type == "normal":
             base = 10
@@ -343,11 +347,11 @@ class GameController:
             self.power_up_timer = 5.0
             self.flash.trigger((0, 100, 255), 100, 0.3)
 
-        # 分数倍率
+        # 分数倍率：基于吃食物前的道具状态，避免新道具被重复计算
         mult = cfg["score_multiplier"]
-        if self.power_up_type == "speed_up":
+        if prev_power_up == "speed_up":
             mult *= 2.0
-        elif self.power_up_type == "slow_down":
+        elif prev_power_up == "slow_down":
             mult *= 1.5
 
         points = int(base * mult)
@@ -415,7 +419,7 @@ class GameController:
         # 数字跳动动画：score_display 逐渐追上 score
         diff = self.score - self.score_display
         if diff > 0:
-            self.score_display += min(diff, diff * dt * 5 + 2)
+            self.score_display = min(float(self.score), self.score_display + diff * dt * 5 + 2)
 
     # ──────────────────── 绘制 ────────────────────
     def draw(self, screen):

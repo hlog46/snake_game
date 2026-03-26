@@ -58,13 +58,16 @@ class ClassicTheme(BaseTheme):
 
     def _draw_eyes(self, surface, x, y, cs, direction):
         dc, dr = direction
+        eo = max(2, cs // 5)   # 眼睛距格子边缘的偏移
+        eg = max(2, cs // 4)   # 两眼的横/纵间距
+        er = max(1, cs // 10)  # 眼睛半径
         # 根据方向计算眼睛位置
-        if dc == 1:   eye_positions = [(x + cs - 5, y + 4), (x + cs - 5, y + cs - 7)]
-        elif dc == -1: eye_positions = [(x + 3, y + 4), (x + 3, y + cs - 7)]
-        elif dr == -1: eye_positions = [(x + 4, y + 3), (x + cs - 7, y + 3)]
-        else:          eye_positions = [(x + 4, y + cs - 5), (x + cs - 7, y + cs - 5)]
+        if dc == 1:    eye_positions = [(x + cs - eo, y + eg), (x + cs - eo, y + cs - eg - 1)]
+        elif dc == -1: eye_positions = [(x + eo, y + eg), (x + eo, y + cs - eg - 1)]
+        elif dr == -1: eye_positions = [(x + eg, y + eo), (x + cs - eg - 1, y + eo)]
+        else:          eye_positions = [(x + eg, y + cs - eo), (x + cs - eg - 1, y + cs - eo)]
         for ep in eye_positions:
-            pygame.draw.circle(surface, (0, 0, 0), ep, 2)
+            pygame.draw.circle(surface, (0, 0, 0), ep, er)
 
     def draw_food(self, surface, food, board):
         x, y = board.cell_to_pixel(*food.pos)
